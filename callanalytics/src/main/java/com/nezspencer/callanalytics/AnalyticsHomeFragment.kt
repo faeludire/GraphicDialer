@@ -9,19 +9,25 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 class AnalyticsHomeFragment : Fragment() {
 
     private lateinit var viewModel: AnalyticsHomeViewModel
     private lateinit var activity: AppCompatActivity
     private lateinit var piechart: PieChart
+    private lateinit var contactsHashMap: HashMap<String, Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>
+    private lateinit var recyclerAdapter: ContactsRecyclerAdapter
 
     companion object {
         fun newInstance() = AnalyticsHomeFragment()
@@ -39,11 +45,15 @@ class AnalyticsHomeFragment : Fragment() {
         )[AnalyticsHomeViewModel::class.java]
         viewModel.getLogsLiveData().observe(this, Observer { map ->
             map?.let {
-                setupData(it)
+                contactsHashMap = it
+                setupData()
             }
         })
         val view = inflater.inflate(R.layout.analytics_home, container, false)
         piechart = view.findViewById(R.id.pie_call_logs)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_logs)
+        recyclerAdapter = ContactsRecyclerAdapter(activity)
+        recyclerView.adapter = recyclerAdapter
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
             activity.checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
@@ -55,36 +65,36 @@ class AnalyticsHomeFragment : Fragment() {
         return view
     }
 
-    private fun setupData(map: HashMap<String, MutableList<PhoneCall>>) {
+    private fun setupData() {
         var missedEntry: PieEntry
         var incomingEntry: PieEntry
         var outgoingEntry: PieEntry
         var rejectedEntry: PieEntry
         val pieEntryList = mutableListOf<PieEntry>()
-        map[missedLabel]?.let {
-            if (it.size > 0) {
-                missedEntry = PieEntry(it.size.toFloat(), "Missed calls", it)
+        contactsHashMap[missedLabel]?.let {
+            if (it.first.size > 0) {
+                missedEntry = PieEntry(it.first.size.toFloat(), "Missed calls", it)
                 pieEntryList.add(missedEntry)
             }
         }
 
-        map[incomingLabel]?.let {
-            if (it.size > 0) {
-                incomingEntry = PieEntry(it.size.toFloat(), "Incoming calls", it)
+        contactsHashMap[incomingLabel]?.let {
+            if (it.first.size > 0) {
+                incomingEntry = PieEntry(it.first.size.toFloat(), "Incoming calls", it)
                 pieEntryList.add(incomingEntry)
             }
         }
 
-        map[outgoingLabel]?.let {
-            if (it.size > 0) {
-                outgoingEntry = PieEntry(it.size.toFloat(), "Outgoing calls", it)
+        contactsHashMap[outgoingLabel]?.let {
+            if (it.first.size > 0) {
+                outgoingEntry = PieEntry(it.first.size.toFloat(), "Outgoing calls", it)
                 pieEntryList.add(outgoingEntry)
             }
         }
 
-        map[rejectedLabel]?.let {
-            if (it.size > 0) {
-                rejectedEntry = PieEntry(it.size.toFloat(), "Rejected calls", it)
+        contactsHashMap[rejectedLabel]?.let {
+            if (it.first.size > 0) {
+                rejectedEntry = PieEntry(it.first.size.toFloat(), "Rejected calls", it)
                 pieEntryList.add(rejectedEntry)
             }
         }
@@ -100,7 +110,23 @@ class AnalyticsHomeFragment : Fragment() {
         piechart.data = pieData
         piechart.setDrawSliceText(false)
         piechart.invalidate()
+        piechart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+            override fun onNothingSelected() {
 
+            }
+
+            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                e?.let {
+                    val data = e.data as Pair<MutableList<PhoneCall>, MutableList<PhoneData>>
+                    recyclerAdapter.swapList(data.second)
+                }
+            }
+        })
+
+
+    }
+
+    private fun populateFrequentlyContactedList(list: MutableList<PhoneData>) {
 
     }
 
