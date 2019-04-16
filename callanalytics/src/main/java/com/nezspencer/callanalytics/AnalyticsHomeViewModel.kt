@@ -1,11 +1,11 @@
 package com.nezspencer.callanalytics
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
 import android.content.ContentResolver
 import android.provider.CallLog
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -78,10 +78,18 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
 
         }
         val hashMap = HashMap<String, Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>()
-        hashMap[AnalyticsHomeFragment.missedLabel] = Pair(missedList, ArrayList(missedGrouped.values))
-        hashMap[AnalyticsHomeFragment.incomingLabel] = Pair(incomingList, ArrayList(outgoingGrouped.values))
-        hashMap[AnalyticsHomeFragment.outgoingLabel] = Pair(outgoingList, ArrayList(outgoingGrouped.values))
-        hashMap[AnalyticsHomeFragment.rejectedLabel] = Pair(rejectedList, ArrayList(rejectedGrouped.values))
+        val missedData = ArrayList(missedGrouped.values)
+        missedData.sortByDescending { it.count }
+        val incomingData = ArrayList(outgoingGrouped.values)
+        incomingData.sortByDescending { it.count }
+        val outgoingData = ArrayList(outgoingGrouped.values)
+        outgoingData.sortByDescending { it.count }
+        val rejectedData = ArrayList(rejectedGrouped.values)
+        rejectedData.sortByDescending { it.count }
+        hashMap[AnalyticsHomeFragment.missedLabel] = Pair(missedList, missedData)
+        hashMap[AnalyticsHomeFragment.incomingLabel] = Pair(incomingList, incomingData)
+        hashMap[AnalyticsHomeFragment.outgoingLabel] = Pair(outgoingList, outgoingData)
+        hashMap[AnalyticsHomeFragment.rejectedLabel] = Pair(rejectedList, rejectedData)
         logsByTypeMapLivedata.postValue(hashMap)
     }
 

@@ -4,4 +4,6 @@
     <color name="incoming">#FF26EB2E</color>
     <color name="outgoing">#FF9C27B0</color>
     <color name="rejected">#FFFF9800</color>
+
+    <color name="analytics_accent">#0055FF</color>
 </resources>

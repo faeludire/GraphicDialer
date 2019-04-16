@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">callAnalytics</string>
     <string name="profile_image_description">contact Image</string>
+    <string name="analytics_permission_prompt">App needs your permission to analyze call logs</string>
+    <string name="analytics_empty_prompt">No call records to analyse</string>
+    <string name="grant_permission">Grant permission</string>
 </resources>
