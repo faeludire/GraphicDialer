@@ -20,14 +20,16 @@ import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.nezspencer.callanalytics.databinding.AnalyticsHomeBinding
+import java.util.*
 
-class AnalyticsHomeFragment : Fragment() {
+class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
 
     private lateinit var viewModel: AnalyticsHomeViewModel
     private lateinit var activity: AppCompatActivity
     private lateinit var binding: AnalyticsHomeBinding
     private lateinit var contactsHashMap: HashMap<String, Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>
     private lateinit var recyclerAdapter: ContactsRecyclerAdapter
+    private lateinit var filterDialog: DateFilterDialog
 
     companion object {
         fun newInstance() = AnalyticsHomeFragment()
@@ -50,6 +52,8 @@ class AnalyticsHomeFragment : Fragment() {
                 setupData()
             }
         })
+
+        filterDialog = DateFilterDialog.newInstance(setupDateFilterDates(), this@AnalyticsHomeFragment)
         recyclerAdapter = ContactsRecyclerAdapter(activity)
         binding.rvLogs.addItemDecoration(
             DividerItemDecoration(
@@ -62,10 +66,18 @@ class AnalyticsHomeFragment : Fragment() {
             requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), RC_CALL_LOG)
         }
 
+        binding.btnFilter.setOnClickListener {
+            filterDialog
+                .show(activity.supportFragmentManager, DateFilterDialog::javaClass.name)
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
             activity.checkSelfPermission(Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
         ) {
-            viewModel.getCallLogs()
+            val cal = initCalender()
+            cal[Calendar.MONTH] = cal.getActualMinimum(Calendar.MONTH)
+            cal[Calendar.DAY_OF_MONTH] = cal.getActualMinimum(Calendar.DAY_OF_MONTH)
+            viewModel.getCallLogs(DateFilter("since this year", cal.timeInMillis))
         } else {
             //no permission granted yet
             showNoPermissionView()
@@ -150,7 +162,10 @@ class AnalyticsHomeFragment : Fragment() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == RC_CALL_LOG && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            viewModel.getCallLogs()
+            val cal = initCalender()
+            cal[Calendar.MONTH] = cal.getActualMinimum(Calendar.MONTH)
+            cal[Calendar.DAY_OF_MONTH] = cal.getActualMinimum(Calendar.DAY_OF_MONTH)
+            viewModel.getCallLogs(DateFilter("since this year", cal.timeInMillis))
         }
     }
 
@@ -175,5 +190,29 @@ class AnalyticsHomeFragment : Fragment() {
         binding.rvLogs.visibility = View.VISIBLE
         binding.tvPrompt.visibility = View.INVISIBLE
         binding.btnGrantPermission.visibility = View.INVISIBLE
+    }
+
+    override fun onFilterClicked(dateFilter: DateFilter) {
+        binding.tvFilterResult.text = dateFilter.name
+        filterDialog.dismiss()
+        viewModel.getCallLogs(dateFilter)
+    }
+
+    private fun setupDateFilterDates(): MutableList<DateFilter> {
+        var calendar = initCalender()
+        val date1 = Date(calendar.timeInMillis)
+        calendar = initCalender()
+        calendar.add(Calendar.DAY_OF_WEEK, -6)
+        val date2 = Date(calendar.timeInMillis)
+        return mutableListOf(
+            DateFilter("Since today", date1.time),
+            DateFilter("last 7 days", date2.time)
+        )
+    }
+
+    private fun initCalender() = Calendar.getInstance().apply {
+        set(Calendar.HOUR, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
     }
 }
