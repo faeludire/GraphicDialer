@@ -6,4 +6,6 @@
     <dimen name="sub_text_size">12sp</dimen>
     <dimen name="normal_text_size">16sp</dimen>
     <dimen name="normal_button_size">60dp</dimen>
+    <dimen name="small_text">14sp</dimen>
+    <dimen name="min_dialog_width">200dp</dimen>
 </resources>

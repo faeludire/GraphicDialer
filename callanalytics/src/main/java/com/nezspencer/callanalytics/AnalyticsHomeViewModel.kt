@@ -2,13 +2,11 @@ package com.nezspencer.callanalytics
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver
+import android.database.Cursor
 import android.provider.CallLog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : ViewModel() {
@@ -17,24 +15,8 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
             Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>>()
 
     @SuppressLint("MissingPermission")
-    fun getCallLogs() {
-        val strFields = arrayOf(
-            android.provider.CallLog.Calls.CACHED_NAME,
-            android.provider.CallLog.Calls.NUMBER,
-            android.provider.CallLog.Calls.DATE,
-            android.provider.CallLog.Calls.TYPE
-        )
-        val calendar = Calendar.getInstance().apply {
-            this.add(Calendar.MONTH, -1)
-        }
-        val strOrder = android.provider.CallLog.Calls.DATE + " DESC"
-        val selection = "${android.provider.CallLog.Calls.DATE} <= ${calendar.timeInMillis}"
+    fun getCallLogs(dateFilter: DateFilter) {
 
-        val mCallCursor =
-            contentResolver.query(
-                android.provider.CallLog.Calls.CONTENT_URI, strFields, null,
-                null, strOrder
-            )
         val missedList = mutableListOf<PhoneCall>()
         val outgoingList = mutableListOf<PhoneCall>()
         val incomingList = mutableListOf<PhoneCall>()
@@ -43,12 +25,11 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
         val outgoingGrouped = hashMapOf<String, PhoneData>()
         val incomingGrouped = hashMapOf<String, PhoneData>()
         val rejectedGrouped = hashMapOf<String, PhoneData>()
-
+        val mCallCursor = queryForCallLogs(dateFilter)
 
         if (mCallCursor.moveToFirst()) {
 
             do {
-
                 val number = mCallCursor.getString(mCallCursor.getColumnIndex(CallLog.Calls.NUMBER))
                 val name = mCallCursor.getString(mCallCursor.getColumnIndex(CallLog.Calls.CACHED_NAME)) ?: number
                 val date = mCallCursor.getLong(mCallCursor.getColumnIndex(android.provider.CallLog.Calls.DATE))
@@ -91,6 +72,24 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
         hashMap[AnalyticsHomeFragment.outgoingLabel] = Pair(outgoingList, outgoingData)
         hashMap[AnalyticsHomeFragment.rejectedLabel] = Pair(rejectedList, rejectedData)
         logsByTypeMapLivedata.postValue(hashMap)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun queryForCallLogs(dateFilter: DateFilter): Cursor {
+        val strFields = arrayOf(
+            android.provider.CallLog.Calls.CACHED_NAME,
+            android.provider.CallLog.Calls.NUMBER,
+            android.provider.CallLog.Calls.DATE,
+            android.provider.CallLog.Calls.TYPE
+        )
+
+        val strOrder = android.provider.CallLog.Calls.DATE + " DESC"
+        val selection = "${android.provider.CallLog.Calls.DATE} BETWEEN ? AND ?"
+
+        return contentResolver.query(
+            CallLog.Calls.CONTENT_URI, strFields, selection,
+            arrayOf(dateFilter.startTime.toString(), dateFilter.endTime.toString()), strOrder
+        )
     }
 
     fun getLogsLiveData(): LiveData<HashMap<String, Pair<MutableList<PhoneCall>,
