@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -133,8 +134,15 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
             activity.resources.getColor(R.color.rejected)
         )
         val pieData = PieData(pieDataset)
+        val legend = binding.pieCallLogs.legend
+        legend.direction = Legend.LegendDirection.LEFT_TO_RIGHT
+        legend.orientation = Legend.LegendOrientation.VERTICAL
+        legend.isWordWrapEnabled = true
+        legend.yOffset = 10f
+        binding.pieCallLogs.description.isEnabled = false
         binding.pieCallLogs.data = pieData
         binding.pieCallLogs.setDrawSliceText(false)
+
         binding.pieCallLogs.invalidate()
         binding.pieCallLogs.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
             override fun onNothingSelected() {
