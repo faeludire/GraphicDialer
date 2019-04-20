@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+            android:layout_width="match_parent"
+            android:scrollbars="none"
+            android:fillViewport="true"
+            android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+                                                           android:paddingTop="@dimen/gutter_margin"
+                                                           android:paddingBottom="@dimen/gutter_margin"
+                                                           android:layout_height="wrap_content">
+
+            <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/line_chart_detail"
+                    android:layout_width="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginStart="@dimen/gutter_margin"
+                    android:layout_marginEnd="@dimen/gutter_margin"
+                    app:layout_constraintBottom_toTopOf="@+id/guide_end"
+                    android:layout_height="0dp"/>
+
+            <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guide_end"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent=".6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/tv_heading"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/guide_end"
+                    android:background="@color/toolbar_color"
+                    android:textStyle="bold"
+                    android:text="@string/overall_summary"
+                    android:gravity="center_horizontal"
+                    android:padding="5dp"
+                    android:textColor="@color/analytics_white"
+                    android:textSize="@dimen/normal_text_size"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/tv_typical_time_label"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_heading"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="@dimen/gutter_margin"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:text="@string/typical_call_time"
+                    android:layout_marginStart="@dimen/gutter_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <TextView
+                    android:id="@+id/tv_typical_time"
+                    app:layout_constraintTop_toTopOf="@+id/tv_typical_time_label"
+                    app:layout_constraintStart_toStartOf="@+id/et_call_rate"
+                    android:layout_marginStart="@dimen/inter_view_margin"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="12 PM"
+                    android:layout_marginEnd="@dimen/gutter_margin"
+                    app:layout_constraintHorizontal_bias=".1"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/tv_typical_duration_label"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_typical_time_label"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginTop="@dimen/inter_view_margin"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:text="@string/typical_call_duration"
+                    android:layout_marginStart="@dimen/gutter_margin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <TextView
+                    android:id="@+id/tv_typical_duration"
+                    app:layout_constraintTop_toTopOf="@+id/tv_typical_duration_label"
+                    app:layout_constraintStart_toStartOf="@+id/et_call_rate"
+                    android:layout_marginStart="@dimen/inter_view_margin"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="2 hours"
+                    android:layout_marginEnd="@dimen/gutter_margin"
+                    app:layout_constraintHorizontal_bias=".1"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/tv_call_rate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_typical_duration_label"
+                    android:layout_marginTop="@dimen/gutter_margin"
+                    android:text="@string/call_rate_prompt"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="@dimen/gutter_margin"
+                    android:layout_height="wrap_content"/>
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_call_rate"
+                    app:layout_constraintTop_toTopOf="@+id/tv_call_rate"
+                    app:layout_constraintStart_toEndOf="@+id/tv_call_rate"
+                    app:layout_constraintWidth_percent=".2"
+                    android:layout_width="0dp"
+                    android:inputType="number"
+                    android:digits="0123456789."
+                    tools:text="1.25"
+                    android:layout_marginEnd="@dimen/gutter_margin"
+                    android:gravity="center_horizontal"
+                    android:layout_marginStart="@dimen/inter_view_margin"
+                    android:textSize="@dimen/normal_text_size"
+                    android:paddingBottom="5dp"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/tv_typical_call_cost"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/et_call_rate"
+                    android:layout_marginTop="@dimen/gutter_margin"
+                    android:text="@string/typical_spend"
+                    style="@style/TextAppearance.AppCompat.Body1"
+                    android:layout_width="wrap_content"
+                    android:layout_marginStart="@dimen/gutter_margin"
+                    android:layout_height="wrap_content"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_call"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_width="wrap_content"
+                    app:fabSize="auto"
+                    android:layout_marginEnd="@dimen/gutter_margin"
+                    app:backgroundTint="@color/analytics_accent"
+                    app:srcCompat="@drawable/ic_call"
+                    app:elevation="@dimen/default_fab_elevation"
+                    android:layout_height="wrap_content"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

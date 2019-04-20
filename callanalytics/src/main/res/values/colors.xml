@@ -6,4 +6,6 @@
     <color name="rejected">#FFFF9800</color>
 
     <color name="analytics_accent">#0055FF</color>
+    <color name="toolbar_color">#666666</color>
+    <color name="analytics_white">#FFFFFFFF</color>
 </resources>

@@ -23,7 +23,8 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.nezspencer.callanalytics.databinding.AnalyticsHomeBinding
 import java.util.*
 
-class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
+class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
+    ContactsRecyclerAdapter.ContactClickListener {
 
     private lateinit var viewModel: AnalyticsHomeViewModel
     private lateinit var activity: AppCompatActivity
@@ -31,9 +32,11 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
     private lateinit var contactsHashMap: HashMap<String, Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>
     private lateinit var recyclerAdapter: ContactsRecyclerAdapter
     private lateinit var filterDialog: DateFilterDialog
+    private var selectedSectorList = mutableListOf<PhoneCall>()
+    private var containerID: Int = 0
 
     companion object {
-        fun newInstance() = AnalyticsHomeFragment()
+        fun newInstance(containerId: Int) = AnalyticsHomeFragment().apply { containerID = containerId }
         const val missedLabel = "missed"
         const val incomingLabel = "incoming"
         const val outgoingLabel = "outgoing"
@@ -54,8 +57,14 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
             }
         })
 
+        viewModel.getDetailListData().observe(this, Observer<MutableList<PhoneCall>> { list ->
+            list?.let {
+                openDetailScreen(it, DataPeriod.WEEK)
+            }
+        })
+
         filterDialog = DateFilterDialog.newInstance(setupDateFilterDates(), this@AnalyticsHomeFragment)
-        recyclerAdapter = ContactsRecyclerAdapter(activity)
+        recyclerAdapter = ContactsRecyclerAdapter(activity, listener = this)
         binding.rvLogs.addItemDecoration(
             DividerItemDecoration(
                 activity,
@@ -153,6 +162,11 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
                 e?.let {
                     val data = e.data as Pair<MutableList<PhoneCall>, MutableList<PhoneData>>
                     recyclerAdapter.swapList(data.second)
+                    selectedSectorList.apply {
+                        clear()
+                        addAll(data.first)
+                    }
+
                 }
             }
         })
@@ -206,20 +220,57 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener {
         viewModel.getCallLogs(dateFilter)
     }
 
+    override fun onContactClicked(data: PhoneData) {
+        viewModel.getRecordsForContact(data.number, selectedSectorList)
+    }
+
     private fun setupDateFilterDates(): MutableList<DateFilter> {
         var calendar = initCalender()
-        val date1 = Date(calendar.timeInMillis)
+        val todayTime = calendar.timeInMillis
         calendar = initCalender()
         calendar.add(Calendar.DAY_OF_WEEK, -6)
-        val date2 = Date(calendar.timeInMillis)
+        val day7Time = calendar.timeInMillis
+
+        val thisMonthTime = initCalender().apply {
+            set(Calendar.DAY_OF_MONTH, getActualMinimum(Calendar.DAY_OF_MONTH))
+        }.timeInMillis
+
+        val lastMonthCal = initCalender().apply {
+            set(Calendar.MONTH, -1)
+            set(Calendar.DAY_OF_MONTH, getActualMinimum(Calendar.DAY_OF_MONTH))
+        }
+        val lastMonthStart = lastMonthCal.timeInMillis
+        val lastMonthEnd = lastMonthCal.apply {
+            set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, getActualMaximum(Calendar.HOUR_OF_DAY))
+            set(Calendar.MINUTE, getActualMaximum(Calendar.MINUTE))
+            set(Calendar.SECOND, getActualMaximum(Calendar.SECOND))
+        }.timeInMillis
+
+        val thisYearDate = initCalender().apply {
+            set(Calendar.WEEK_OF_YEAR, getActualMinimum(Calendar.WEEK_OF_YEAR))
+            set(Calendar.MONTH, getActualMinimum(Calendar.MONTH))
+            set(Calendar.DAY_OF_MONTH, getActualMinimum(Calendar.DAY_OF_MONTH))
+        }.timeInMillis
+
         return mutableListOf(
-            DateFilter("Since today", date1.time),
-            DateFilter("last 7 days", date2.time)
+            DateFilter("Since today", todayTime),
+            DateFilter("last 7 days", day7Time),
+            DateFilter("this month", thisMonthTime),
+            DateFilter("Last month", lastMonthStart, lastMonthEnd),
+            DateFilter("This year", thisYearDate)
         )
     }
 
+    private fun openDetailScreen(list: MutableList<PhoneCall>, period: DataPeriod) {
+        val name = AnalyticsDetailFragment::javaClass.name
+        activity.supportFragmentManager.beginTransaction()
+            .replace(containerID, AnalyticsDetailFragment.newInstance(list, period), name)
+            .addToBackStack(name).commit()
+    }
+
     private fun initCalender() = Calendar.getInstance().apply {
-        set(Calendar.HOUR, 0)
+        set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
     }
