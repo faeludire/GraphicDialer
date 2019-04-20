@@ -11,6 +11,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frame, AnalyticsHomeFragment.newInstance()).commit()
+            .replace(
+                R.id.frame, AnalyticsHomeFragment.newInstance(R.id.frame),
+                AnalyticsHomeFragment::javaClass.name
+            )
+            .addToBackStack(AnalyticsHomeFragment::javaClass.name).commit()
     }
 }

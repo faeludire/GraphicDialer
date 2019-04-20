@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ContactsRecyclerAdapter(
     private val context: Context,
-    private val contactList: MutableList<PhoneData> = mutableListOf()
+    private val contactList: MutableList<PhoneData> = mutableListOf(),
+    private val listener: ContactClickListener
 ) : RecyclerView.Adapter<ContactsRecyclerAdapter.Holder>() {
 
 
@@ -25,6 +26,7 @@ class ContactsRecyclerAdapter(
         val item = contactList[p0.adapterPosition]
         p0.contactName.text = item.name
         p0.frequencyView.text = "${item.count} times"
+        p0.itemView.setOnClickListener { listener.onContactClicked(item) }
 
     }
 
@@ -38,5 +40,9 @@ class ContactsRecyclerAdapter(
         val profileImage: ImageView = itemView.findViewById(R.id.iv_profile)
         val contactName: TextView = itemView.findViewById(R.id.tv_contact_name)
         val frequencyView: TextView = itemView.findViewById(R.id.tv_frequency)
+    }
+
+    interface ContactClickListener {
+        fun onContactClicked(data: PhoneData)
     }
 }

@@ -13,6 +13,7 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
 
     private val logsByTypeMapLivedata = MutableLiveData<HashMap<String,
             Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>>()
+    private val detailViewData = MutableLiveData<MutableList<PhoneCall>>()
 
     @SuppressLint("MissingPermission")
     fun getCallLogs(dateFilter: DateFilter) {
@@ -103,4 +104,18 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
             record.count += 1
         map[log.number] = record
     }
+
+    fun getRecordsForContact(phoneNumber: String, logs: MutableList<PhoneCall>) {
+
+        val resultList = mutableListOf<PhoneCall>()
+        for (log in logs) {
+            if (phoneNumber == log.number)
+                resultList.add(log)
+        }
+
+        resultList.sortBy { it.date }
+        detailViewData.postValue(resultList)
+    }
+
+    fun getDetailListData(): LiveData<MutableList<PhoneCall>> = detailViewData
 }
