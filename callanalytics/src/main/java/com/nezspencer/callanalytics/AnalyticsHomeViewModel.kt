@@ -13,7 +13,7 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
 
     private val logsByTypeMapLivedata = MutableLiveData<HashMap<String,
             Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>>()
-    private val detailViewData = MutableLiveData<MutableList<PhoneCall>>()
+    private val detailViewData = MutableLiveData<Event<MutableList<PhoneCall>>>()
 
     @SuppressLint("MissingPermission")
     fun getCallLogs(dateFilter: DateFilter) {
@@ -114,8 +114,8 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
         }
 
         resultList.sortBy { it.date }
-        detailViewData.postValue(resultList)
+        detailViewData.postValue(Event(resultList))
     }
 
-    fun getDetailListData(): LiveData<MutableList<PhoneCall>> = detailViewData
+    fun getDetailListData(): LiveData<Event<MutableList<PhoneCall>>> = detailViewData
 }
