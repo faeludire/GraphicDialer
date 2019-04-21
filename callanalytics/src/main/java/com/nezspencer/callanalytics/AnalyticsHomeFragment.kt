@@ -57,8 +57,8 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
             }
         })
 
-        viewModel.getDetailListData().observe(this, Observer<MutableList<PhoneCall>> { list ->
-            list?.let {
+        viewModel.getDetailListData().observe(this, Observer<Event<MutableList<PhoneCall>>> { event ->
+            event.getIfNotHandled()?.let {
                 openDetailScreen(it, DataPeriod.WEEK)
             }
         })
