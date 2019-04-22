@@ -62,7 +62,7 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
         val hashMap = HashMap<String, Pair<MutableList<PhoneCall>, MutableList<PhoneData>>>()
         val missedData = ArrayList(missedGrouped.values)
         missedData.sortByDescending { it.count }
-        val incomingData = ArrayList(outgoingGrouped.values)
+        val incomingData = ArrayList(incomingGrouped.values)
         incomingData.sortByDescending { it.count }
         val outgoingData = ArrayList(outgoingGrouped.values)
         outgoingData.sortByDescending { it.count }
