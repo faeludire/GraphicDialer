@@ -13,8 +13,8 @@
                                                            android:paddingBottom="@dimen/gutter_margin"
                                                            android:layout_height="wrap_content">
 
-            <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/line_chart_detail"
+            <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/chart_detail"
                     android:layout_width="0dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

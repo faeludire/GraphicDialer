@@ -12,8 +12,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.nezspencer.callanalytics.databinding.AnalyticsDetailBinding
 
@@ -38,7 +38,7 @@ class AnalyticsDetailFragment : Fragment() {
             this,
             AnalyticsDetailViewModelFactory(dataList)
         )[AnalyticsDetailViewModel::class.java]
-        viewModel.getGraphData().observe(this, Observer<Pair<LineDataSet, MutableList<String>>> { pair ->
+        viewModel.getGraphData().observe(this, Observer<Pair<BarDataSet, MutableList<String>>> { pair ->
             pair?.let {
                 setupData(it)
             }
@@ -47,9 +47,9 @@ class AnalyticsDetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupData(lineDataPair: Pair<LineDataSet, MutableList<String>>) {
+    private fun setupData(lineDataPair: Pair<BarDataSet, MutableList<String>>) {
 
-        val xAxis = binding.lineChartDetail.xAxis
+        val xAxis = binding.chartDetail.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         val xAxisFormatter = object : IndexAxisValueFormatter() {
             override fun getFormattedValue(value: Float, axis: AxisBase?): String {
@@ -61,10 +61,10 @@ class AnalyticsDetailFragment : Fragment() {
         xAxis.valueFormatter = xAxisFormatter
 
         val dataSet = lineDataPair.first
-        dataSet.color = ContextCompat.getColor(hostActivity, R.color.toolbar_color);
-        dataSet.valueTextColor = ContextCompat.getColor(hostActivity, R.color.analytics_accent);
-        binding.lineChartDetail.data = LineData(dataSet)
-        binding.lineChartDetail.animateX(1000)
+        dataSet.color = ContextCompat.getColor(hostActivity, R.color.toolbar_color)
+        dataSet.valueTextColor = ContextCompat.getColor(hostActivity, R.color.analytics_accent)
+        binding.chartDetail.data = BarData(dataSet)
+        binding.chartDetail.animateX(1000)
     }
 
     override fun onAttach(context: Context?) {

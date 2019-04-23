@@ -3,14 +3,14 @@ package com.nezspencer.callanalytics
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import java.util.*
 import kotlin.collections.ArrayList
 
 class AnalyticsDetailViewModel(private val dataList: MutableList<PhoneCall>) : ViewModel() {
 
-    private val lineGraphData = MutableLiveData<Pair<LineDataSet, MutableList<String>>>()
+    private val lineGraphData = MutableLiveData<Pair<BarDataSet, MutableList<String>>>()
 
     fun prepareDataForGraph(period: DataPeriod) {
         when (period) {
@@ -42,13 +42,13 @@ class AnalyticsDetailViewModel(private val dataList: MutableList<PhoneCall>) : V
 
         val parsedList = ArrayList(map.values)
         val labels = ArrayList(map.keys)
-        val lineEntries = mutableListOf<Entry>()
+        val barEntries = mutableListOf<BarEntry>()
         for ((i, data) in parsedList.withIndex()) {
-            lineEntries.add(Entry(i.toFloat(), data.count.toFloat(), data))
+            barEntries.add(BarEntry(i.toFloat(), data.count.toFloat(), data))
         }
-        val dataset = LineDataSet(lineEntries, "")
+        val dataset = BarDataSet(barEntries, "")
         lineGraphData.postValue(Pair(dataset, labels))
     }
 
-    fun getGraphData(): LiveData<Pair<LineDataSet, MutableList<String>>> = lineGraphData
+    fun getGraphData(): LiveData<Pair<BarDataSet, MutableList<String>>> = lineGraphData
 }
