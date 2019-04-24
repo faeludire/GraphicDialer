@@ -9,4 +9,5 @@
     <string name="call_rate_prompt">Enter call rate (per second):</string>
     <string name="overall_summary">Overall summary</string>
     <string name="typical_spend">Typically spends %s per call</string>
+    <string name="filter">Filter</string>
 </resources>
