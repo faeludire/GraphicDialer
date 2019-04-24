@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -44,6 +42,27 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
         const val RC_CALL_LOG = 100
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.item_filter -> {
+                filterDialog
+                    .show(activity.supportFragmentManager, DateFilterDialog::javaClass.name)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = AnalyticsHomeBinding.inflate(inflater)
         viewModel = ViewModelProviders.of(
@@ -74,11 +93,6 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
         binding.rvLogs.adapter = recyclerAdapter
         binding.btnGrantPermission.setOnClickListener {
             requestPermissions(arrayOf(Manifest.permission.READ_CALL_LOG), RC_CALL_LOG)
-        }
-
-        binding.btnFilter.setOnClickListener {
-            filterDialog
-                .show(activity.supportFragmentManager, DateFilterDialog::javaClass.name)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
@@ -170,7 +184,6 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
                 }
             }
         })
-
 
 
     }
