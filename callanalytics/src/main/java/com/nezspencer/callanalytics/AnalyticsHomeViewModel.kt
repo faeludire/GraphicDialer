@@ -68,10 +68,10 @@ class AnalyticsHomeViewModel(private val contentResolver: ContentResolver) : Vie
         outgoingData.sortByDescending { it.count }
         val rejectedData = ArrayList(rejectedGrouped.values)
         rejectedData.sortByDescending { it.count }
-        hashMap[AnalyticsHomeFragment.missedLabel] = Pair(missedList, missedData)
-        hashMap[AnalyticsHomeFragment.incomingLabel] = Pair(incomingList, incomingData)
-        hashMap[AnalyticsHomeFragment.outgoingLabel] = Pair(outgoingList, outgoingData)
-        hashMap[AnalyticsHomeFragment.rejectedLabel] = Pair(rejectedList, rejectedData)
+        hashMap[LogType.MISSED.label] = Pair(missedList, missedData)
+        hashMap[LogType.RECEIVED.label] = Pair(incomingList, incomingData)
+        hashMap[LogType.DIALED.label] = Pair(outgoingList, outgoingData)
+        hashMap[LogType.REJECTED.label] = Pair(rejectedList, rejectedData)
         logsByTypeMapLivedata.postValue(hashMap)
     }
 

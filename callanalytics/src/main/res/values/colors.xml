@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="missed">#FFE60B56</color>
-    <color name="incoming">#FF26EB2E</color>
+    <color name="received">#FF26EB2E</color>
     <color name="outgoing">#FF9C27B0</color>
     <color name="rejected">#FFFF9800</color>
 

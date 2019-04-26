@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
@@ -35,10 +34,6 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
 
     companion object {
         fun newInstance(containerId: Int) = AnalyticsHomeFragment().apply { containerID = containerId }
-        const val missedLabel = "missed"
-        const val incomingLabel = "incoming"
-        const val outgoingLabel = "outgoing"
-        const val rejectedLabel = "rejected"
         const val RC_CALL_LOG = 100
     }
 
@@ -115,30 +110,30 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
         var outgoingEntry: PieEntry
         var rejectedEntry: PieEntry
         val pieEntryList = mutableListOf<PieEntry>()
-        contactsHashMap[missedLabel]?.let {
+        contactsHashMap[LogType.MISSED.label]?.let {
             if (it.first.size > 0) {
-                missedEntry = PieEntry(it.first.size.toFloat(), "Missed calls", it)
+                missedEntry = PieEntry(it.first.size.toFloat(), LogType.MISSED.label, it)
                 pieEntryList.add(missedEntry)
             }
         }
 
-        contactsHashMap[incomingLabel]?.let {
+        contactsHashMap[LogType.RECEIVED.label]?.let {
             if (it.first.size > 0) {
-                incomingEntry = PieEntry(it.first.size.toFloat(), "Incoming calls", it)
+                incomingEntry = PieEntry(it.first.size.toFloat(), LogType.RECEIVED.label, it)
                 pieEntryList.add(incomingEntry)
             }
         }
 
-        contactsHashMap[outgoingLabel]?.let {
+        contactsHashMap[LogType.DIALED.label]?.let {
             if (it.first.size > 0) {
-                outgoingEntry = PieEntry(it.first.size.toFloat(), "Outgoing calls", it)
+                outgoingEntry = PieEntry(it.first.size.toFloat(), LogType.DIALED.label, it)
                 pieEntryList.add(outgoingEntry)
             }
         }
 
-        contactsHashMap[rejectedLabel]?.let {
+        contactsHashMap[LogType.REJECTED.label]?.let {
             if (it.first.size > 0) {
-                rejectedEntry = PieEntry(it.first.size.toFloat(), "Rejected calls", it)
+                rejectedEntry = PieEntry(it.first.size.toFloat(), LogType.REJECTED.label, it)
                 pieEntryList.add(rejectedEntry)
             }
         }
@@ -149,10 +144,10 @@ class AnalyticsHomeFragment : Fragment(), DateFilterAdapter.DateFilterListener,
         } else
             showDataView()
 
-        val pieDataset = PieDataSet(pieEntryList, "Call-Log analysis")
+        val pieDataset = LogsPieDataSet(pieEntryList, "Call-Log analysis")
         pieDataset.colors = mutableListOf(
             activity.resources.getColor(R.color.missed),
-            activity.resources.getColor(R.color.incoming),
+            activity.resources.getColor(R.color.received),
             activity.resources.getColor(R.color.outgoing),
             activity.resources.getColor(R.color.rejected)
         )
